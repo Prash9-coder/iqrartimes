@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Category API</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .test-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .test-button {
+            padding: 12px 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        .test-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 500px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+        .comparison {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        .category-list {
+            margin-top: 10px;
+            padding-left: 20px;
+        }
+        .category-item {
+            margin: 5px 0;
+            padding: 5px;
+            background: white;
+            border-radius: 4px;
+        }
+        .child-category {
+            margin-left: 20px;
+            color: #666;
+            font-size: 0.9em;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .stat-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Category API Debug Tool</h1>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="parentCount">0</div>
+                <div class="stat-label">Parent Categories (parent_only=true)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="allCount">0</div>
+                <div class="stat-label">All Categories (parent_only=false)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="difference">0</div>
+                <div class="stat-label">Child Categories</div>
+            </div>
+        </div>
+
+        <div class="test-buttons">
+            <button class="test-button" onclick="testParentOnly()">Test parent_only=true</button>
+            <button class="test-button" onclick="testAllCategories()">Test parent_only=false</button>
+            <button class="test-button" onclick="compareResults()">Compare Results</button>
+        </div>
+
+        <div id="results"></div>
+        <div id="comparison" class="comparison"></div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'https://api.iqrartimes.com';
+        let parentResponse = null;
+        let allResponse = null;
+
+        // Auto-run tests when page loads
+        window.addEventListener('load', async () => {
+            console.log('Page loaded, starting tests...');
+            await testEndpoint('backoffice/category?parent_only=true&language=HINDI', 'parent');
+            await testEndpoint('backoffice/category?parent_only=false&language=HINDI', 'all');
+            console.log('Tests completed, comparing results...');
+            compareResults();
+        });
+
+        async function testParentOnly() {
+            await testEndpoint('backoffice/category?parent_only=true&language=HINDI', 'parent');
+        }
+
+        async function testAllCategories() {
+            await testEndpoint('backoffice/category?parent_only=false&language=HINDI', 'all');
+        }
+
+        async function testEndpoint(endpoint, type) {
+            const resultsDiv = document.getElementById('results');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = 'result loading';
+            resultDiv.textContent = `Testing ${endpoint}...`;
+            resultsDiv.appendChild(resultDiv);
+
+            try {
+                let url = `${API_BASE_URL}/${endpoint}`;
+                if (url.includes('category?')) {
+                    url = url.replace('category?', 'category/?');
+                }
+                
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                
+                resultDiv.className = 'result success';
+                resultDiv.textContent = `✅ ${endpoint}\n` + JSON.stringify(data, null, 2);
+                
+                if (type === 'parent') {
+                    parentResponse = data;
+                    document.getElementById('parentCount').textContent = data.data?.length || 0;
+                } else {
+                    allResponse = data;
+                    document.getElementById('allCount').textContent = data.data?.length || 0;
+                }
+                
+                updateDifference();
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `❌ ${endpoint}\n${error.message}`;
+            }
+        }
+
+        function updateDifference() {
+            if (parentResponse && allResponse) {
+                const difference = (allResponse.data?.length || 0) - (parentResponse.data?.length || 0);
+                document.getElementById('difference').textContent = difference;
+            }
+        }
+
+        async function compareResults() {
+            if (!parentResponse || !allResponse) {
+                alert('Please run both tests first');
+                return;
+            }
+
+            const comparisonDiv = document.getElementById('comparison');
+            comparisonDiv.innerHTML = `
+                <h3>📊 Comparison Results</h3>
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-number">${parentResponse.data.length}</div>
+                        <div class="stat-label">Parent Categories</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${allResponse.data.length}</div>
+                        <div class="stat-label">All Categories</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${allResponse.data.length - parentResponse.data.length}</div>
+                        <div class="stat-label">Child Categories</div>
+                    </div>
+                </div>
+                <div style="margin-top: 20px;">
+                    <h4>🚨 Analysis:</h4>
+                </div>
+            `;
+
+            const allCategoryNames = allResponse.data.map(c => c.name);
+            const parentCategoryNames = parentResponse.data.map(c => c.name);
+            
+            const childCategories = allResponse.data.filter(cat => {
+                const isParent = parentResponse.data.some(parent => parent.id === cat.id);
+                return !isParent;
+            });
+
+            const hasChildren = childCategories.length > 0;
+
+            if (!hasChildren) {
+                comparisonDiv.innerHTML += `
+                    <p style="color: #dc3545; font-weight: bold;">❌ ERROR: No child categories found. This indicates the filter is not working properly.</p>
+                `;
+            } else {
+                comparisonDiv.innerHTML += `
+                    <p style="color: #28a745; font-weight: bold;">✅ Filter is working! ${childCategories.length} child categories are correctly excluded when parent_only=true.</p>
+                    <h4 style="margin-top: 15px;">Child categories that should be excluded:</h4>
+                    <div class="category-list">
+                        ${childCategories.map(c => `<div class="child-category">• ${c.name} (ID: ${c.id})</div>`).join('')}
+                    </div>
+                `;
+            }
+
+            // Check if parent_only=true is returning any child categories
+            const parentResponseHasChildren = parentResponse.data.some(cat => {
+                return childCategories.some(child => child.id === cat.id);
+            });
+
+            if (parentResponseHasChildren) {
+                comparisonDiv.innerHTML += `
+                    <p style="color: #dc3545; font-weight: bold; margin-top: 15px;">❌ FAILURE: parent_only=true is still returning child categories!</p>
+                    <h4>Offending categories:</h4>
+                    <div class="category-list">
+                        ${parentResponse.data.filter(cat => childCategories.some(child => child.id === cat.id)).map(c => `<div class="child-category">• ${c.name} (ID: ${c.id})</div>`).join('')}
+                    </div>
+                `;
+            }
+
+            // Display full lists
+            comparisonDiv.innerHTML += `
+                <div style="margin-top: 20px;">
+                    <h4>Full list of all categories (${allResponse.data.length}):</h4>
+                    <div class="category-list">
+                        ${allResponse.data.map(c => `<div class="category-item">${c.name} (ID: ${c.id})</div>`).join('')}
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <h4>Categories returned when parent_only=true (${parentResponse.data.length}):</h4>
+                    <div class="category-list">
+                        ${parentResponse.data.map(c => `<div class="category-item">${c.name} (ID: ${c.id})</div>`).join('')}
+                    </div>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
