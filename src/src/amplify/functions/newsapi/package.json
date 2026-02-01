@@ -1,0 +1,6 @@
+{
+    "name": "newsapi-function",
+    "version": "1.0.0",
+    "type": "module",
+    "main": "handler.js"
+}

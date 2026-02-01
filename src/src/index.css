@@ -1,0 +1,360 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Merriweather:wght@300;400;700;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background-color: #f9fafb;
+  color: #111827;
+  overflow-x: hidden;
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, #e31e24 0%, #ff6b6b 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.glass-effect {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #e90404;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #e31e24;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #c71a1f;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Article Content Styling - News9Live Style */
+.prose h3 {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #111827;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  line-height: 1.3;
+}
+
+.prose p {
+  margin-bottom: 1.5rem;
+  line-height: 1.8;
+  color: #374151;
+  font-size: 18px;
+}
+
+.prose h3:first-child {
+  margin-top: 0;
+}
+
+.prose strong {
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.prose ul,
+.prose ol {
+  margin: 1.5rem 0;
+  padding-left: 1.5rem;
+}
+
+.prose li {
+  margin-bottom: 0.75rem;
+  line-height: 1.7;
+}
+
+/* Better spacing */
+.prose>*+* {
+  margin-top: 1.5rem;
+}
+
+/* Marquee Animation for Breaking News */
+@keyframes marquee {
+  from {
+    transform: translateX(100%);
+  }
+
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 30s linear infinite;
+}
+
+/* Live TV Page Dark Theme Override */
+.bg-gray-900 .sticky {
+  background-color: #1a1a1a;
+}
+
+/* Add to your index.css */
+
+/* E-Paper Viewer Styles */
+.epaper-page-shadow {
+  box-shadow:
+    0 0 20px rgba(0, 0, 0, 0.3),
+    0 0 60px rgba(0, 0, 0, 0.1);
+}
+
+/* Smooth page transitions */
+.epaper-transition {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Page flip animation */
+@keyframes pageFlip {
+  0% {
+    transform: perspective(1200px) rotateY(0deg);
+  }
+
+  100% {
+    transform: perspective(1200px) rotateY(-15deg);
+  }
+}
+
+.page-flip-enter {
+  animation: pageFlip 0.3s ease-out;
+}
+
+/* Touch-friendly styles for mobile */
+@media (max-width: 768px) {
+  .epaper-mobile-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    background: rgba(26, 26, 26, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+}
+
+/* Fullscreen styles */
+.epaper-fullscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999;
+  background: #1a1a1a;
+}
+
+/* Add to index.css */
+
+/* E-Paper specific styles */
+.epaper-image {
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+}
+
+/* Hide scrollbar but keep functionality */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Smooth transitions for zoom */
+.epaper-zoom-transition {
+  transition: transform 0.2s ease-out;
+}
+
+/* PDF Viewer Specific Styles */
+.pdf-viewer-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.pdf-viewer-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: #ffffff;
+}
+
+.pdf-viewer-fullscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999;
+  background: #000000;
+}
+
+/* PDF Thumbnail Styles */
+.pdf-thumbnail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #2d3748;
+  color: white;
+  font-family: 'Inter', sans-serif;
+}
+
+.pdf-thumbnail-icon {
+  font-size: 24px;
+  margin-bottom: 4px;
+}
+
+.pdf-thumbnail-text {
+  font-size: 10px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.pdf-thumbnail-page {
+  font-size: 8px;
+  opacity: 0.8;
+}
+
+/* PDF Controls */
+.pdf-controls {
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
+  padding: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+}
+
+.pdf-control-button {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  transition: all 0.2s;
+}
+
+.pdf-control-button:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Responsive PDF Viewer */
+@media (max-width: 768px) {
+  .pdf-viewer-mobile {
+    padding: 0;
+    margin: 0;
+  }
+
+  .pdf-controls-mobile {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 8px;
+  }
+}
+
+/* Add to src/index.css for mobile app feel */
+
+@layer utilities {
+
+  /* Touch-friendly sizes */
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Safe area support */
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .pt-safe {
+    padding-top: env(safe-area-inset-top);
+  }
+
+  /* Smooth scrolling */
+  html {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* No tap highlight */
+  * {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+  }
+
+  /* Active states */
+  .active\:scale-95:active {
+    transform: scale(0.95);
+  }
+
+  .active\:scale-98:active {
+    transform: scale(0.98);
+  }
+
+  /* Smooth transitions */
+  .transition-all {
+    transition: all 0.2s ease;
+  }
+}
+
+/* Mobile-first breakpoints */
+@media (max-width: 640px) {
+
+  /* Larger text on mobile */
+  body {
+    font-size: 16px;
+  }
+
+  /* Better spacing */
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+.more-mega h4 {
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.more-mega li {
+    font-size: 14px;
+    line-height: 1.6;
+}
